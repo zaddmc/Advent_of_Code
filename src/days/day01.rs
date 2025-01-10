@@ -4,7 +4,7 @@ use itertools::*;
 ///////////////////////////////////////////////////////////////////////////////
 
 pub fn solve() -> SolutionPair {
-    let input = std::fs::read_to_string("input/day01.txt").unwrap();
+    let input = std::fs::read_to_string("input/day1.txt").unwrap();
     let (mut left_col, mut right_col) = parse(&input);
 
     left_col.sort();
@@ -22,8 +22,7 @@ pub fn solve() -> SolutionPair {
         .map(|i| i * counts.get(&i).copied().unwrap_or(0) as i32)
         .sum();
 
-    println!("{}", sol1);
-    (Solution::from(sol1), Solution::from(sol2))
+    return (Solution::from(sol1), Solution::from(sol2));
 }
 
 fn parse(input: &str) -> (Vec<i32>, Vec<i32>) {
@@ -33,5 +32,5 @@ fn parse(input: &str) -> (Vec<i32>, Vec<i32>) {
         ls1.push(i1.parse().unwrap());
         ls2.push(i2.parse().unwrap());
     }
-    (ls1, ls2)
+    return (ls1, ls2);
 }
