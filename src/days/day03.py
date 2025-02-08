@@ -10,15 +10,15 @@ with open("../../input/day3.txt", "r", encoding="utf-8") as data:
     product_sum_enb = 0
     enabled_flag = True
     for letter in data.read():
-        if prev_letters == "do()":
+        if prev_letters == "do(" and letter == ")":
             enabled_flag = True
             print("Enabled")
-            prev_letters = letter
+            prev_letters = ""
             continue
-        if prev_letters == "don't()":
+        if prev_letters == "don't(" and letter == ")":
             enabled_flag = False
             print("Disabled")
-            prev_letters = letter
+            prev_letters = ""
             continue
 
         if prev_letters[0:4] == "mul(":
@@ -66,6 +66,7 @@ with open("../../input/day3.txt", "r", encoding="utf-8") as data:
                 continue
         except:
             pass
+
         prev_letters = ""
     print(product_sum)
     print(product_sum_enb)
