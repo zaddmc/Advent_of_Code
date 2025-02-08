@@ -33,7 +33,8 @@ def check(x, y) -> int:
 
             if target != DATA[nx][ny]:
                 break
-            succes += 1
+            if target == "S":
+                succes += 1
     return succes
 
 
