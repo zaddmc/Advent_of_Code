@@ -22,18 +22,27 @@ for rule in orderrules:
     except:
         orderdict[lhs] = [rhs]
 
-sum_val = 0
-for line in checklist:
-    list_val = []
-    original_list = line[:-1].split(",")
-    for val in original_list:
-        if True not in [tval in list_val for tval in orderdict[val]]:
-            list_val.append(val)
-    print(f"Original list {original_list}")
-    print(f"Detemined val {list_val}")
-    valid = len(original_list) == len(list_val)
-    print(f"Is valid {valid}")
-    if valid:
-        sum_val += int(list_val[int(len(list_val) / 2)])
 
-print(f"Final value {sum_val}")
+def isValid(original):
+    """no"""
+    is_valid_check_list = []
+    for check in original:
+        if True not in [tval in is_valid_check_list for tval in orderdict[check]]:
+            is_valid_check_list.append(check)
+        else:
+            return False
+    return True
+
+
+sum_val_valid = 0
+for line in checklist:
+    original_list = line[:-1].split(",")
+    if isValid(original_list):
+        sum_val_valid += int(original_list[int(len(original_list) / 2)])
+
+print(f"Final value {sum_val_valid}")
+print(
+    "Should be false : "
+    + str(isValid(["52", "23", "24", "83", "51", "56", "37", "48", "96", "88", "63"]))
+)
+print("Should be True  : " + str(isValid(["73", "56", "42", "27", "18", "97", "53"])))
