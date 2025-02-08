@@ -14,18 +14,26 @@ with open("../../input/day5.txt", "r", encoding="utf-8") as source:
         else:
             orderrules.append(line)
 
-orderlist = []
+orderdict = {}
 for rule in orderrules:
     lhs, rhs = rule[:-1].split("|")
+    try:
+        orderdict[lhs].append(rhs)
+    except:
+        orderdict[lhs] = [rhs]
 
-    if lhs not in orderlist and rhs not in orderlist:
-        orderlist.append(lhs)
-        orderlist.append(rhs)
-        continue
+sum_val = 0
+for line in checklist:
+    list_val = []
+    original_list = line[:-1].split(",")
+    for val in original_list:
+        if True not in [tval in list_val for tval in orderdict[val]]:
+            list_val.append(val)
+    print(f"Original list {original_list}")
+    print(f"Detemined val {list_val}")
+    valid = len(original_list) == len(list_val)
+    print(f"Is valid {valid}")
+    if valid:
+        sum_val += int(list_val[int(len(list_val) / 2)])
 
-    if lhs in orderlist and rhs not in orderlist:
-        orderlist.insert(orderlist.index(lhs) + 1, rhs)
-
-    print(f"Failed to allocate either {lhs} or {rhs}")
-
-print(orderlist)
+print(f"Final value {sum_val}")
