@@ -34,11 +34,11 @@ def move_guard():
         case _:
             raise Exception
 
-    if line > max_index or letter > max_index or line < 0 or letter < 0:
+    if line >= max_index or letter >= max_index or line < 0 or letter < 0:
         DISTINCT_TILES += 1  # Otherwise its of by 1
         return (-69, -69)
 
-    if MAP[line][letter] in ".X":
+    if MAP[line][letter] in ".X+^":
         if MAP[line][letter] == ".":
             DISTINCT_TILES += 1
             MAP[line] = MAP[line][:letter] + "X" + MAP[line][letter + 1 :]
@@ -50,13 +50,58 @@ def move_guard():
     GUARD_DIRECTION = posible_directions[
         (posible_directions.index(GUARD_DIRECTION) + 1) % 4
     ]
+    MAP[GUARD_POS[0]] = (
+        MAP[GUARD_POS[0]][: GUARD_POS[1]] + "+" + MAP[GUARD_POS[0]][GUARD_POS[1] + 1 :]
+    )
     return GUARD_POS
+
+
+POTENTIAL_LOOPS = 0
+
+
+def check_for_loop():
+    global POTENTIAL_LOOPS
+    posible_directions = "^>v<"
+    next_direction = posible_directions[
+        (posible_directions.index(GUARD_DIRECTION) + 1) % 4
+    ]
+    line, letter = GUARD_POS
+    flag_oldpath = False
+
+    while True:
+        match next_direction:
+            case "^":
+                line -= 1
+            case ">":
+                letter += 1
+            case "v":
+                line += 1
+            case "<":
+                letter -= 1
+            case _:
+                raise Exception
+
+        if line >= max_index or letter >= max_index or line < 0 or letter < 0:
+            return
+
+        if MAP[line][letter] in ".X+^":
+            if MAP[line][letter] == "+":
+                flag_oldpath = True
+            continue
+
+        if flag_oldpath:
+            POTENTIAL_LOOPS += 1
+            return
 
 
 while GUARD_POS != (-69, -69):
     GUARD_POS = move_guard()
+    check_for_loop()
     # for line in MAP:
     #    print(line)
     # print(f"Pos: {GUARD_POS} Direction: {GUARD_DIRECTION}")
     # print(DISTINCT_TILES)
+for line in MAP:
+    print(line)
 print(DISTINCT_TILES)
+print(POTENTIAL_LOOPS)
