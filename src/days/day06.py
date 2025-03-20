@@ -91,7 +91,14 @@ def check_for_loop():
 
         if flag_oldpath:
             POTENTIAL_LOOPS += 1
+            print_map()
+            input()
             return
+
+
+def print_map():
+    for line in MAP:
+        print(line)
 
 
 while GUARD_POS != (-69, -69):
@@ -101,7 +108,6 @@ while GUARD_POS != (-69, -69):
     #    print(line)
     # print(f"Pos: {GUARD_POS} Direction: {GUARD_DIRECTION}")
     # print(DISTINCT_TILES)
-for line in MAP:
-    print(line)
+print_map()
 print(DISTINCT_TILES)
 print(POTENTIAL_LOOPS)
