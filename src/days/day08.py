@@ -23,24 +23,24 @@ for idx, line in enumerate(DATA):
         add_to_dict(letter, idx, idy)
 
 
-def find_antinode(val1: tuple[int, int], val2: tuple[int, int]) -> int:
-    new_antinodes: int = 0
+def find_antinode(val1: tuple[int, int], val2: tuple[int, int], mul):
     delta = get_delta(val1, val2)
 
-    new_antinodes += do_calc(val1, delta, sub_tuple)
-    new_antinodes += do_calc(val2, delta, add_tuple)
-    return new_antinodes
+    do_calc(val1, delta, sub_tuple, mul)
+    do_calc(val2, delta, add_tuple, mul)
 
 
-def do_calc(val, delta, operator):
-    if in_bounds(operator(val, delta)):
-        fish = operator(val, delta)
-        if DATA[fish[0]][fish[1]] != "#":
-            DATA[fish[0]] = (
-                DATA[fish[0]][: fish[1]] + "#" + DATA[fish[0]][fish[1] + 1 :]
-            )
-            return 1
-    return 0
+def do_calc(val, delta, operator, mul):
+    node = operator(val, delta)
+    while in_bounds(node):
+        if in_bounds(node):
+            if DATA[node[0]][node[1]] != "#":
+                DATA[node[0]] = (
+                    DATA[node[0]][: node[1]] + "#" + DATA[node[0]][node[1] + 1 :]
+                )
+        if not mul:
+            break
+        node = operator(node, delta)
 
 
 def add_tuple(val1: tuple[int, int], val2: tuple[int, int]) -> tuple[int, int]:
@@ -59,16 +59,37 @@ def in_bounds(val: tuple[int, int]) -> bool:
     return 0 <= val[0] < SIZE and 0 <= val[1] < SIZE
 
 
-def pr():
+def pr(val):
     for line in DATA:
         print(line)
-    print(f"{p1=}")
+    print(f"{val=}")
+
+
+def go_through(mul: bool):
+    for freq, vals in antenna_dict.items():
+        for val in vals:
+            for other in vals[vals.index(val, 0, 1000) + 1 :]:
+                find_antinode(val, other, mul)
+
+
+def count_dathing(mul: bool):
+    count = 0
+    for line in DATA:
+        for letter in line:
+            if mul:
+                if letter != ".":
+                    count += 1
+            else:
+                if letter == "#":
+                    count += 1
+    return count
 
 
 # Iterate thru antenna frequencies and determine
-p1 = 0
-for freq, vals in antenna_dict.items():
-    for val in vals:
-        for other in vals[vals.index(val, 0, 1000) + 1 :]:
-            p1 += find_antinode(val, other)
+go_through(False)
+p1 = count_dathing(False)
 print(f"{p1=}")
+
+go_through(True)
+p2 = count_dathing(True)
+print(f"{p2=}")
