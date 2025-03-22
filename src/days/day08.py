@@ -27,23 +27,20 @@ def find_antinode(val1: tuple[int, int], val2: tuple[int, int]) -> int:
     new_antinodes: int = 0
     delta = get_delta(val1, val2)
 
-    if in_bounds(sub_tuple(val1, delta)):
-        fish = sub_tuple(val1, delta)
-        if DATA[fish[0]][fish[1]] != "#":
-            DATA[fish[0]] = (
-                DATA[fish[0]][: fish[1]] + "#" + DATA[fish[0]][fish[1] + 1 :]
-            )
-            new_antinodes += 1
-
-    if in_bounds(add_tuple(val2, delta)):
-        fish = add_tuple(val2, delta)
-        if DATA[fish[0]][fish[1]] != "#":
-            DATA[fish[0]] = (
-                DATA[fish[0]][: fish[1]] + "#" + DATA[fish[0]][fish[1] + 1 :]
-            )
-            new_antinodes += 1
-
+    new_antinodes += do_calc(val1, delta, sub_tuple)
+    new_antinodes += do_calc(val2, delta, add_tuple)
     return new_antinodes
+
+
+def do_calc(val, delta, operator):
+    if in_bounds(operator(val, delta)):
+        fish = operator(val, delta)
+        if DATA[fish[0]][fish[1]] != "#":
+            DATA[fish[0]] = (
+                DATA[fish[0]][: fish[1]] + "#" + DATA[fish[0]][fish[1] + 1 :]
+            )
+            return 1
+    return 0
 
 
 def add_tuple(val1: tuple[int, int], val2: tuple[int, int]) -> tuple[int, int]:
