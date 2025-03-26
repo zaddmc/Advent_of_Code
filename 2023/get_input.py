@@ -1,7 +1,7 @@
 import subprocess
 import sys
 
-SESSION = open(".cookie", "r").read().strip()
+SESSION = open("../.cookie", "r").read().strip()
 YEAR = sys.path[0].split("/")[-1]
 
 
