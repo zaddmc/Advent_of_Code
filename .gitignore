@@ -33,5 +33,3 @@ Cargo.lock
 # Cookie with session token
 .cookie
 
-# Dont need my input files on the git
-input/
