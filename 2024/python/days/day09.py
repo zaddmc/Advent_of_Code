@@ -102,5 +102,10 @@ p1 = checksum(collapse(expand(DATA, False)))
 print(f"{p1=}")
 
 print(checksum(simplify(reorder(expand("2333133121414131402", True)))))
+test_val = "2333133121414131402"
+print(expand(test_val, True))
+print(reorder(expand(test_val, True)))
+print(simplify(reorder(expand(test_val, True))))
+exit(0)
 p2 = checksum(simplify(reorder(expand(DATA, True))))
 print(f"{p2=}")
