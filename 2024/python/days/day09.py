@@ -1,5 +1,5 @@
 DATA: str = ""
-with open("../../input/day9.txt", "r") as file:
+with open("../../input/day09.txt", "r") as file:
     DATA = file.read()[:-1]
 
 
@@ -60,9 +60,26 @@ def reorder(string: list[list[str]]):
                 string.insert(
                     i_spot + 1, ["." for _ in range(len(spot) - len(section))]
                 )
+                string = concatenate(string)
 
                 break
     return string
+
+
+def concatenate(string: list[list[str]]) -> list[list[str]]:
+    new_string = []
+    prev_elm = []
+    for elm in string:
+        if "." in prev_elm and "." in elm:
+            prev_elm.extend(elm)
+            continue
+
+        if elm == []:
+            continue
+
+        new_string.append(elm)
+        prev_elm = elm
+    return new_string
 
 
 def simplify(string: list[list]) -> list:
@@ -85,5 +102,10 @@ p1 = checksum(collapse(expand(DATA, False)))
 print(f"{p1=}")
 
 print(checksum(simplify(reorder(expand("2333133121414131402", True)))))
+test_val = "2333133121414131402"
+print(expand(test_val, True))
+print(reorder(expand(test_val, True)))
+print(simplify(reorder(expand(test_val, True))))
+exit(0)
 p2 = checksum(simplify(reorder(expand(DATA, True))))
 print(f"{p2=}")
