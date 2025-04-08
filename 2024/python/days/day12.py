@@ -3,22 +3,22 @@ def solve() -> tuple[int, int]:
     get_data(False)
     Marked = [[0 for _ in range(SIZE)] for _ in range(SIZE)]
 
-    p2 = yes()
-    return (p2, -1)
+    p1 = part_1()
+    return (p1, -1)
 
 
-def yes():
+def part_1():
     price = 0
     for idx, line in enumerate(DATA):
         for idy, char in enumerate(line):
             if Marked[idx][idy]:
                 continue
-            area, perimeter = breadth_search(idx, idy, char)
+            area, perimeter = breath_search(idx, idy, char)
             price += area * perimeter
     return price
 
 
-def breadth_search(idx: int, idy: int, search_char: str) -> tuple[int, int]:
+def breath_search(idx: int, idy: int, search_char: str) -> tuple[int, int]:
     """
     Returning tuple = (area, perimeter)
     """
@@ -36,16 +36,34 @@ def breadth_search(idx: int, idy: int, search_char: str) -> tuple[int, int]:
         return (0, 1)
 
     next_search = [
-        breadth_search(idx + 1, idy, search_char),
-        breadth_search(idx - 1, idy, search_char),
-        breadth_search(idx, idy + 1, search_char),
-        breadth_search(idx, idy - 1, search_char),
+        breath_search(idx + 1, idy, search_char),
+        breath_search(idx - 1, idy, search_char),
+        breath_search(idx, idy + 1, search_char),
+        breath_search(idx, idy - 1, search_char),
     ]
     own_return_par = [1, 0]
     for elm in next_search:
         own_return_par[0] += elm[0]
         own_return_par[1] += elm[1]
     return tuple(own_return_par)
+
+
+def check_limit(idx: int, idy: int, direction: int, search_char: str) -> bool:
+    pass
+
+
+def check_neighbor(idx: int, idy: int, search_char: str, direction: int) -> bool:
+    try:
+        if Marked[idx][idy] and DATA[idx][idy] == search_char:
+            x, y = DIRECTION_DICT[direction]  # The change to indexes
+            if DATA[idx + x][idy + y] != search_char:
+                return (0, 1)
+
+    except KeyError:
+        return (0, 0)
+
+
+DIRECTION_DICT = {1: (1, 0), 2: (-1, 0), 3: (0, 1), 4: (0, -1)}
 
 
 def pr_marked():
