@@ -3,28 +3,37 @@ def solve() -> tuple[int, int]:
     get_data(False)
     Marked = [[0 for _ in range(SIZE)] for _ in range(SIZE)]
 
-    p1 = part_1()
-    return (p1, -1)
+    p1 = part_1(False)
+    p2 = part_1(True)
+    return (p1, p2)
 
 
-def part_1():
+def part_1(ispart2):
     price = 0
     for idx, line in enumerate(DATA):
         for idy, char in enumerate(line):
             if Marked[idx][idy]:
                 continue
-            area, perimeter = breath_search(idx, idy, char)
+            area, perimeter = breath_search(idx, idy, char, 0, ispart2)
             price += area * perimeter
     return price
 
 
-def breath_search(idx: int, idy: int, search_char: str) -> tuple[int, int]:
+def breath_search(
+    idx: int, idy: int, search_char: str, direction: int, ispart2: bool
+) -> tuple[int, int]:
     """
     Returning tuple = (area, perimeter)
     """
     global Marked
+    lhs, rhs = DIRECTION_DICT[direction]
+    idx += lhs
+    idy += rhs
+
     # Out of bounds perimeter
     if not (0 < idx + 1 <= SIZE) or not (0 < idy + 1 <= SIZE):
+        if ispart2:
+            return check_neighbor(idx, idy, search_char, direction)
         return (0, 1)
 
     # Backtracking results in nothing
@@ -33,18 +42,15 @@ def breath_search(idx: int, idy: int, search_char: str) -> tuple[int, int]:
             return (0, 0)
         Marked[idx][idy] = 1
     else:
+        if ispart2:
+            return check_neighbor(idx, idy, search_char, direction)
         return (0, 1)
 
-    next_search = [
-        breath_search(idx + 1, idy, search_char),
-        breath_search(idx - 1, idy, search_char),
-        breath_search(idx, idy + 1, search_char),
-        breath_search(idx, idy - 1, search_char),
-    ]
     own_return_par = [1, 0]
-    for elm in next_search:
-        own_return_par[0] += elm[0]
-        own_return_par[1] += elm[1]
+    for dir in range(1, 5):
+        area, perimeter = breath_search(idx, idy, search_char, dir, ispart2)
+        own_return_par[0] += area
+        own_return_par[1] += perimeter
     return tuple(own_return_par)
 
 
@@ -61,9 +67,10 @@ def check_neighbor(idx: int, idy: int, search_char: str, direction: int) -> bool
 
     except KeyError:
         return (0, 0)
+    return (0, 0)
 
 
-DIRECTION_DICT = {1: (1, 0), 2: (-1, 0), 3: (0, 1), 4: (0, -1)}
+DIRECTION_DICT = {0: (0, 0), 1: (1, 0), 2: (-1, 0), 3: (0, 1), 4: (0, -1)}
 
 
 def pr_marked():
