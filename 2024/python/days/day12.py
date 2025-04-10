@@ -55,7 +55,14 @@ def breath_search(
 
 
 def check_limit(idx: int, idy: int, direction: int, search_char: str) -> bool:
-    pass
+    returns = []
+    match direction:
+        case 1 | 2:
+            returns.append(check_neighbor(idx, idy + 1, search_char, direction))
+            returns.append(check_neighbor(idx, idy - 1, search_char, direction))
+        case 3 | 4:
+            returns.append(check_neighbor(idx + 1, idy, search_char, direction))
+            returns.append(check_neighbor(idx - 1, idy, search_char, direction))
 
 
 def check_neighbor(idx: int, idy: int, search_char: str, direction: int) -> bool:
