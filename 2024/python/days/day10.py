@@ -50,8 +50,6 @@ def find_trail(idx: int, idy: int, next_val: str, trail_list: list):
 
 
 def tally(trail_dict: dict[tuple, list[tuple]]):
-    for key, asd in trail_dict.items():
-        print(key, len(asd), asd)
     return sum(map(len, trail_dict.values()))
 
 
