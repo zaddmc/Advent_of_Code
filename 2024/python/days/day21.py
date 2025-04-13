@@ -18,13 +18,24 @@ def numeral(start: str, end: str) -> str:
     return "a"
 
 
+def generate_numeral(start: str, end: str) -> str:
+    start_pos = get_index(start)
+    end_pos = get_index(end)
+
+    res_vec = (end_pos[0] - start_pos[0], end_pos[1] - start_pos[1])
+    result = ""
+
+    return "a"
+
+
 def generate_numeral_dict() -> dict:
     chars = "A0123456789"
     ndict = {}  # numeral dict
     for start in chars:
         for end in chars:
-            ndict[start + end] = "a"
-            print(get_index(start))
+            res = generate_numeral(start, end)
+            ndict[start + end] = res
+            print(res)
 
 
 def get_index(char: str) -> tuple[int, int]:
