@@ -8,24 +8,32 @@ def solve() -> tuple[int, int]:
 
 def numeric(code: str) -> str:
     mcode = "A" + code
+    ndict = generate_numeral_dict()
     replacement = ""
     for idx in range(len(code)):
-        replacement += numeral(mcode[idx], mcode[idx + 1])
+        replacement += ndict[mcode[idx] + mcode[idx + 1]]
     return replacement
-
-
-def numeral(start: str, end: str) -> str:
-    return "a"
 
 
 def generate_numeral(start: str, end: str) -> str:
     start_pos = get_index(start)
     end_pos = get_index(end)
 
-    res_vec = (end_pos[0] - start_pos[0], end_pos[1] - start_pos[1])
+    vertical = end_pos[0] - start_pos[0]
+    horizontal = end_pos[1] - start_pos[1]
     result = ""
+    if horizontal < 0:
+        result += "<" * (horizontal * -1)
+    else:
+        result += ">" * horizontal
 
-    return "a"
+    if vertical < 0:
+        result += "^" * (vertical * -1)
+    else:
+        result += "v" * vertical
+
+    result += "A"
+    return result
 
 
 def generate_numeral_dict() -> dict:
@@ -35,7 +43,7 @@ def generate_numeral_dict() -> dict:
         for end in chars:
             res = generate_numeral(start, end)
             ndict[start + end] = res
-            print(res)
+    return ndict
 
 
 def get_index(char: str) -> tuple[int, int]:
