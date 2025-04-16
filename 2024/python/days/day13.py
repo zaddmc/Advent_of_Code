@@ -1,3 +1,6 @@
+import sympy
+
+
 def solve() -> tuple[int, int]:
     get_data()
     p1 = sum(claw_machine(segment, False) for segment in get_segments())
@@ -13,7 +16,7 @@ def claw_machine(segment, ispart2: bool) -> int:
     if ispart2:
         goal = (goal[0] + 10000000000000, goal[1] + 10000000000000)
 
-    # return min(modding(claw_A, claw_B, goal), default=0)
+    return rowreducing(claw_A, claw_B, goal)
     return min(brute_force(claw_A, claw_B, goal), default=0)
 
 
@@ -24,8 +27,16 @@ def brute_force(claw_A, claw_B, goal) -> int:
                 yield a * 3 + b
 
 
-def modding(claw_A, claw_B, goal) -> int:
-    yield 0
+def rowreducing(claw_A, claw_B, goal) -> int:
+    m = sympy.Matrix(
+        [[claw_A[0], claw_B[0], goal[0]], [claw_A[1], claw_B[1], goal[1]]]
+    ).rref()
+    a, b = m[0][2], m[0][5]
+    if isinstance(a, sympy.core.numbers.Integer) and isinstance(
+        b, sympy.core.numbers.Integer
+    ):
+        return a * 3 + b
+    return 0
 
 
 def disect(seg: str) -> tuple[int, int]:
