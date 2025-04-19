@@ -1,10 +1,15 @@
 def solve():
     get_data(False)
     robots = list(interpret_data())
-    imply_movement(robots, 100)
-    # pr_map(robots)
-    p1 = get_safety(robots)
-    return (p1, -1)
+    pr_map(robots, False)
+    for i in range(10000):
+        imply_movement(robots, 1)
+        if pr_map(robots, False):
+            p2 = i + 1
+            break
+        if i == 100:
+            p1 = get_safety(robots)
+    return (p1, p2)
 
 
 def get_safety(robots: list) -> int:
@@ -96,25 +101,36 @@ def pr_robots(robots: list):
         print(robot)
 
 
-def pr_map(robots: list):
+def pr_map(robots: list, prin: bool):
     map = [[0 for _ in range(WIDTH)] for _ in range(HEIGHT)]
 
     for robot in robots:
         x, y = robot.pos
         map[y][x] += 1
+    counter = 0
+    flag = False
 
     for hei, line in enumerate(map):
         for wid, val in enumerate(line):
             if val == 0:
-                if wid == WIDTH // 2:
-                    print("|", end="")
-                elif hei == HEIGHT // 2:
-                    print("-", end="")
-                else:
-                    print(".", end="")
+                if prin:
+                    if wid == WIDTH // 2:
+                        print("|", end="")
+                    elif hei == HEIGHT // 2:
+                        print("-", end="")
+                    else:
+                        print(".", end="")
+                counter = 0
             else:
-                print(val, end="")
-        print()
+                if prin:
+                    print(val, end="")
+                counter += 1
+                if counter > 8:
+                    flag = True
+
+        if prin:
+            print()
+    return flag
 
 
 if __name__ == "__main__":
