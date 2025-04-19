@@ -1,7 +1,5 @@
 def solve() -> tuple[int, int]:
-    global Marked
-    get_data(False)
-    Marked = [[0 for _ in range(SIZE)] for _ in range(SIZE)]
+    get_data(True)
 
     p1 = part_1(False)
     p2 = part_1(True)
@@ -9,6 +7,8 @@ def solve() -> tuple[int, int]:
 
 
 def part_1(ispart2):
+    global Marked
+    Marked = [[0 for _ in range(SIZE)] for _ in range(SIZE)]
     price = 0
     for idx, line in enumerate(DATA):
         for idy, char in enumerate(line):
@@ -33,7 +33,7 @@ def breath_search(
     # Out of bounds perimeter
     if not (0 < idx + 1 <= SIZE) or not (0 < idy + 1 <= SIZE):
         if ispart2:
-            return check_neighbor(idx, idy, search_char, direction)
+            return check_limit(idx, idy, search_char, direction)
         return (0, 1)
 
     # Backtracking results in nothing
@@ -43,7 +43,7 @@ def breath_search(
         Marked[idx][idy] = 1
     else:
         if ispart2:
-            return check_neighbor(idx, idy, search_char, direction)
+            return check_limit(idx, idy, search_char, direction)
         return (0, 1)
 
     own_return_par = [1, 0]
@@ -54,7 +54,7 @@ def breath_search(
     return tuple(own_return_par)
 
 
-def check_limit(idx: int, idy: int, direction: int, search_char: str) -> bool:
+def check_limit(idx: int, idy: int, search_char: str, direction: int) -> bool:
     returns = []
     match direction:
         case 1 | 2:
@@ -63,6 +63,9 @@ def check_limit(idx: int, idy: int, direction: int, search_char: str) -> bool:
         case 3 | 4:
             returns.append(check_neighbor(idx + 1, idy, search_char, direction))
             returns.append(check_neighbor(idx - 1, idy, search_char, direction))
+    if (0, 1) in returns:
+        return (0, 1)
+    return (0, 0)
 
 
 def check_neighbor(idx: int, idy: int, search_char: str, direction: int) -> bool:
@@ -74,6 +77,8 @@ def check_neighbor(idx: int, idy: int, search_char: str, direction: int) -> bool
 
     except KeyError:
         return (0, 0)
+    except IndexError:
+        return (0, 1)
     return (0, 0)
 
 
