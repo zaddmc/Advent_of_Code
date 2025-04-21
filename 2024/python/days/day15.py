@@ -2,7 +2,12 @@ def solve() -> tuple[int, int]:
     get_data(False)
     begin()
     p1 = gps_sum()
-    return (p1, -1)
+
+    get_data(False)
+    convert_map()
+    begin()
+    p2 = gps_sum()
+    return (p1, p2)
 
 
 def begin():
@@ -14,10 +19,6 @@ def begin():
             continue
         do_move(move, POS, ".")
         POS = tup_add(POS, DIRECTION_DICT[move])
-        continue
-        pr_map()
-        print(move)
-        input()
 
 
 def do_move(dir, pos, new_char):
@@ -30,6 +31,14 @@ def do_move(dir, pos, new_char):
     match map_tup(new_pos):
         case "O":
             do_move(dir, new_pos, next_char)
+        case "[":
+            do_move(dir, new_pos, next_char)
+            if dir in "^v":
+                do_move(dir, tup_add(new_pos, ">"), ".")
+        case "]":
+            do_move(dir, new_pos, next_char)
+            if dir in "^v":
+                do_move(dir, tup_add(new_pos, "<"), ".")
         case "#":
             raise Exception("Should not have been found")
         case ".":
@@ -46,6 +55,18 @@ def check_move(dir, pos):
     match map_tup(pos):
         case "O":
             return check_move(dir, pos)
+        case "[":
+            if dir in "^v":
+                return check_move(dir, pos) and check_move(dir, tup_add(pos, ">"))
+            if dir == ">":
+                return check_move(dir, tup_add(pos, ">"))
+            raise Exception("'dir' was likely '<'")
+        case "]":
+            if dir in "^v":
+                return check_move(dir, pos) and check_move(dir, tup_add(pos, "<"))
+            if dir == "<":
+                return check_move(dir, tup_add(pos, "<"))
+            raise Exception("'dir' was likely '>'")
         case "#":
             return False
         case ".":
@@ -60,7 +81,7 @@ def gps_sum():
     def gps_cords():
         for idx, line in enumerate(MAP):
             for idy, char in enumerate(line):
-                if char == "O":
+                if char in "O[":
                     yield idy + idx * 100
 
     return sum(gps_cords())
@@ -69,7 +90,19 @@ def gps_sum():
 DIRECTION_DICT = {"<": (-1, 0), "^": (0, -1), ">": (1, 0), "v": (0, 1)}
 
 
+def convert_map():
+    CONVERSION_DICT = {"#": "##", "O": "[]", ".": "..", "@": "@."}
+
+    for i, line in enumerate(MAP):
+        new_line = []
+        for elm in line:
+            new_line.extend(list(CONVERSION_DICT[elm]))
+        MAP[i] = new_line
+
+
 def tup_add(tup1: tuple[int, int], tup2: tuple[int, int]) -> tuple[int, int]:
+    if isinstance(tup2, str):
+        tup2 = DIRECTION_DICT[tup2]
     return (tup1[0] + tup2[0], tup1[1] + tup2[1])
 
 
@@ -94,7 +127,7 @@ def find_start_pos() -> tuple[int, int]:
     for idx, line in enumerate(MAP):
         for idy, char in enumerate(line):
             if char == "@":
-                POS = (idx, idy)
+                POS = (idy, idx)
 
 
 def get_data(test: bool):
