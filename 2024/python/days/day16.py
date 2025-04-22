@@ -1,18 +1,23 @@
+import sys
+
+sys.setrecursionlimit(100000)
+
+
 def solve() -> tuple[int, int]:
     global Marked
-    get_data(True)
+    get_data(False)
     Marked = []
-    p1 = BFS(find_maze("S"), ">")
+    p1 = BFS(find_maze("S"), ">", Marked) - 1
     return (p1, -1)
 
 
-def BFS(pos: tuple[int, int], dir: str):
+def BFS(pos: tuple[int, int], dir: str, marked: list):
     # print(pos, dir, maze_tup(pos))
     # input()
 
-    if pos in Marked:
+    if pos in marked:
         return 0
-    Marked.append(pos)
+    marked.append(pos)
 
     match maze_tup(pos):
         case "#":
@@ -21,16 +26,17 @@ def BFS(pos: tuple[int, int], dir: str):
             return 1
         case "." | "S":
             left, straight, right = [
-                BFS(tup_add(pos, turn(dir, c)), turn(dir, c)) for c in range(-1, 2)
+                BFS(tup_add(pos, turn(dir, c)), turn(dir, c), marked.copy())
+                for c in range(-1, 2)
             ]
 
             plist = []
             if left:
-                plist.append(left + 1000)
+                plist.append(left + 1001)
             if straight:
                 plist.append(straight + 1)
             if right:
-                plist.append(right + 1000)
+                plist.append(right + 1001)
 
             if len(plist) != 0:
                 return min(plist)
