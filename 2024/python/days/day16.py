@@ -8,6 +8,7 @@ def solve() -> tuple[int, int]:
     get_data(False)
     Marked = []
     p1 = BFS(find_maze("S"), ">", Marked) - 1
+    p1 = Dijkstra(find_maze("S"), find_maze("E"))
     return (p1, -1)
 
 
@@ -43,6 +44,33 @@ def BFS(pos: tuple[int, int], dir: str, marked: list):
             return 0
         case _ as a:
             raise Exception(f"Unknown char: '{a}'")
+
+
+def Dijkstra(source: tuple[int, int], dest: tuple[int, int]):
+    closed_set = {}
+    open_set = {source: 0}
+    current, cur_dist = open_set[source]
+
+    while current != dest:
+        if len(open_set) == 0:
+            raise Exception("No Path found")
+
+        current, cur_dist = find_next(open_set)
+        open_set.pop(current)
+        closed_set[current] = cur_dist
+
+        for neighbor in [tup_add(current, dir) for dir in ["<", "^", ">", "v"]]:
+            pass
+
+    return 0
+
+
+def find_next(mdict: dict[tuple, int]):
+    current, cur_dist = mdict.items()[0]
+    for pot, pot_dist in mdict.items():
+        if pot_dist < cur_dist:
+            current, cur_dist = mdict[pot]
+    return mdict[current]
 
 
 DIRECTION_DICT = {"<": (0, -1), "^": (-1, 0), ">": (0, 1), "v": (1, 0)}
