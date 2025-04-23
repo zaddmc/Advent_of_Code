@@ -1,11 +1,24 @@
 def solve() -> tuple[int, int]:
+    get_data(False)
+
+    p1 = run_computer()
+    return (p1, -1)
+
+
+def run_computer():
     global Output, IP
-    get_data(True)
     Output = []
     IP = 0
 
-    tests()
-    return (-1, -1)
+    while True:
+        if IP + 1 > len(PROG):
+            string = ""
+            for num in Output:
+                string += str(num) + ","
+            return string[:-1]
+        opcode = PROG[IP]
+        operand = PROG[IP + 1]
+        compute(opcode, operand)
 
 
 def compute(opcode: int, operand: int):
@@ -13,7 +26,7 @@ def compute(opcode: int, operand: int):
     ip_changed = False
     match opcode:
         case 0:  # adv
-            REG_A = REG_A / pow(2, com_operand(operand))
+            REG_A = REG_A // pow(2, com_operand(operand))
         case 1:  # bxl
             REG_B = REG_B ^ operand
         case 2:  # bst
@@ -27,9 +40,9 @@ def compute(opcode: int, operand: int):
         case 5:  # out
             Output.append(com_operand(operand) % 8)
         case 6:  # bdv
-            REG_B = REG_A / pow(2, com_operand(operand))
+            REG_B = REG_A // pow(2, com_operand(operand))
         case 7:  # cdv
-            REG_C = REG_A / pow(2, com_operand(operand))
+            REG_C = REG_A // pow(2, com_operand(operand))
 
     if not ip_changed:
         IP += 2
