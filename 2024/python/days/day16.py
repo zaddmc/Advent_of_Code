@@ -1,3 +1,4 @@
+import heapq
 import sys
 from collections import deque
 
@@ -6,47 +7,44 @@ sys.setrecursionlimit(10000)
 
 def solve() -> tuple[int, int]:
     global Marked
-    get_data(True)
-    Marked = []
-    # p1 = BFS(find_maze("S"), ">", Marked) - 1
+    get_data(False)
+    # p1 = BFS(find_maze("S"), ">", set()) - 1
     # p1 = Dijkstra(find_maze("S"), find_maze("E"))
     p1 = shortest_safe_path(find_maze("S"), find_maze("E"))
     return (p1, -1)
 
 
 def shortest_safe_path(start, end):
-    directions = [(-1, 0, "^"), (1, 0, "v"), (0, -1, "<"), (0, 1, ">")]
-    rows, cols = len(MAZE), len(MAZE[0])
+    directions = [(-1, 0, "^"), (0, 1, ">"), (1, 0, "v"), (0, -1, "<")]
 
     # BFS setup
-    queue = deque([(start[0], start[1], ">", 0)])  # (row, col, dir, path_length)
+    pque = [(0, (*start, ">"))]  # (row, col, dir, path_length)
     visited = set()
-    visited.add((0, 0))
+    # visited.add((0, 0))
 
-    while queue:
-        r, c, dir, length = queue.popleft()
+    while pque:
+        score, (r, c, dir) = heapq.heappop(pque)
 
         if (r, c) == end:
-            return length
+            return score
+        if (r, c, dir) in visited:
+            continue
+        visited.add((r, c, dir))
 
         for dr, dc, ndir in directions:
             nr, nc = r + dr, c + dc
-            if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in visited:
-                if MAZE[nr][nc] in ".ES":
-                    visited.add((nr, nc))
-                    val_add = 1 if dir == ndir else 1001
-                    queue.append((nr, nc, ndir, length + val_add))
-
-    return None  # No path found
+            if MAZE[nr][nc] in ".ES":
+                cost = 1 if dir == ndir else 1001
+                heapq.heappush(pque, (score + cost, (nr, nc, ndir)))
 
 
-def BFS(pos: tuple[int, int], dir: str, marked: list):
+def BFS(pos: tuple[int, int], dir: str, visited: set):
     # print(pos, dir, maze_tup(pos), end="")
     # input()
 
-    if pos in marked:
+    if pos in visited:
         return 0
-    marked.append(pos)
+    visited.add(pos)
 
     match maze_tup(pos):
         case "#":
@@ -55,7 +53,7 @@ def BFS(pos: tuple[int, int], dir: str, marked: list):
             return 1
         case "." | "S":
             left, straight, right = [
-                BFS(tup_add(pos, turn(dir, c)), turn(dir, c), marked.copy())
+                BFS(tup_add(pos, turn(dir, c)), turn(dir, c), visited)
                 for c in range(-1, 2)
             ]
 
@@ -101,7 +99,7 @@ def Dijkstra(source: tuple[int, int], dest: tuple[int, int]):
                 open_set[neighbor] = cur_dist + 1
             else:
                 open_set[neighbor] = cur_dist + 1001
-
+    print(closed_set)
     return cur_dist
 
 
@@ -163,7 +161,7 @@ def get_data(test: bool):
         ]
     else:
         with open("../../input/day16.txt", "r") as file:
-            MAZE = file.read().strip().splitlines()
+            MAZE = file.read().splitlines()
 
 
 if __name__ == "__main__":
