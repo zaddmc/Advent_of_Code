@@ -1,7 +1,6 @@
-"""Day3 of AoC in python"""
+"""Day03 of AoC in python"""
 
-# pylint: disable-msg=C0103
-with open("../../input/day3.txt", "r", encoding="utf-8") as data:
+with open("../../input/day03.txt", "r", encoding="utf-8") as data:
     prev_letters = ""
     comma_flag = False
     val1 = ""
