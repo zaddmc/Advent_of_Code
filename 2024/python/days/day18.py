@@ -5,7 +5,15 @@ def solve() -> tuple[int, int]:
     get_data(False)
     make_map()
     p1 = shortest_safe_path()
-    return (p1, -1)
+    p2 = part2()
+    return (p1, p2)
+
+
+def part2():
+    for line in range(len(DATA) - BYTES):
+        make_map(line + BYTES)
+        if not shortest_safe_path():
+            return DATA[line + BYTES]
 
 
 def shortest_safe_path():
@@ -29,16 +37,20 @@ def shortest_safe_path():
                     queue.append((nr, nc, length + 1))
                     visited.add((nr, nc))
 
-    return -1  # No path found
+    return None  # No path found
 
 
-def make_map():
+def make_map(add_line: int = 0):
     global MAP
-    MAP = [["." for _ in range(SIZE)] for _ in range(SIZE)]
-    for num, line in enumerate(DATA):
-        if num == BYTES:
-            break
-        x, y = list(map(int, line.split(",")))
+    if add_line == 0:
+        MAP = [["." for _ in range(SIZE)] for _ in range(SIZE)]
+        for num, line in enumerate(DATA):
+            if num == BYTES:
+                break
+            x, y = list(map(int, line.split(",")))
+            MAP[y][x] = "#"
+    else:
+        x, y = list(map(int, DATA[add_line].split(",")))
         MAP[y][x] = "#"
 
 
