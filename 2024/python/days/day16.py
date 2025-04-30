@@ -10,32 +10,41 @@ def solve() -> tuple[int, int]:
     get_data(False)
     # p1 = BFS(find_maze("S"), ">", set()) - 1
     # p1 = Dijkstra(find_maze("S"), find_maze("E"))
-    p1 = shortest_safe_path(find_maze("S"), find_maze("E"))
-    return (p1, -1)
+
+    paths = list(shortest_safe_path(find_maze("S"), find_maze("E")))
+    p1 = paths[0][-1]
+
+    seats = set()
+    for path in paths:
+        seats |= set(path[0])
+    p2 = len(seats)
+    return (p1, p2)
 
 
 def shortest_safe_path(start, end):
     directions = [(-1, 0, "^"), (0, 1, ">"), (1, 0, "v"), (0, -1, "<")]
 
-    # BFS setup
-    pque = [(0, (*start, ">"))]  # (row, col, dir, path_length)
-    visited = set()
-    # visited.add((0, 0))
+    pque = [(0, (*start, ">"), [start])]
+    visited = {}
+    best_score = 9999999
 
-    while pque:
-        score, (r, c, dir) = heapq.heappop(pque)
+    while pque and pque[0][0] <= best_score:
+        score, (r, c, dir), path = heapq.heappop(pque)
 
         if (r, c) == end:
-            return score
-        if (r, c, dir) in visited:
+            best_score = score
+            yield path, score
             continue
-        visited.add((r, c, dir))
+
+        if (r, c, dir) in visited.keys() and visited[(r, c, dir)] < score:
+            continue
+        visited[(r, c, dir)] = score
 
         for dr, dc, ndir in directions:
             nr, nc = r + dr, c + dc
             if MAZE[nr][nc] in ".ES":
                 cost = 1 if dir == ndir else 1001
-                heapq.heappush(pque, (score + cost, (nr, nc, ndir)))
+                heapq.heappush(pque, (score + cost, (nr, nc, ndir), path + [(nr, nc)]))
 
 
 def BFS(pos: tuple[int, int], dir: str, visited: set):
