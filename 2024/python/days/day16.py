@@ -1,15 +1,43 @@
 import sys
+from collections import deque
 
 sys.setrecursionlimit(10000)
 
 
 def solve() -> tuple[int, int]:
     global Marked
-    get_data(False)
+    get_data(True)
     Marked = []
     # p1 = BFS(find_maze("S"), ">", Marked) - 1
-    p1 = Dijkstra(find_maze("S"), find_maze("E"))
+    # p1 = Dijkstra(find_maze("S"), find_maze("E"))
+    p1 = shortest_safe_path(find_maze("S"), find_maze("E"))
     return (p1, -1)
+
+
+def shortest_safe_path(start, end):
+    directions = [(-1, 0, "^"), (1, 0, "v"), (0, -1, "<"), (0, 1, ">")]
+    rows, cols = len(MAZE), len(MAZE[0])
+
+    # BFS setup
+    queue = deque([(start[0], start[1], ">", 0)])  # (row, col, dir, path_length)
+    visited = set()
+    visited.add((0, 0))
+
+    while queue:
+        r, c, dir, length = queue.popleft()
+
+        if (r, c) == end:
+            return length
+
+        for dr, dc, ndir in directions:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in visited:
+                if MAZE[nr][nc] in ".ES":
+                    visited.add((nr, nc))
+                    val_add = 1 if dir == ndir else 1001
+                    queue.append((nr, nc, ndir, length + val_add))
+
+    return None  # No path found
 
 
 def BFS(pos: tuple[int, int], dir: str, marked: list):
