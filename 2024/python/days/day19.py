@@ -1,35 +1,31 @@
 def solve() -> tuple[int, int]:
-    get_data(True)
-    trimed_towels = trim_towels()
-    p1 = part1(trimed_towels)
+    get_data(False)
+    p1 = sum([1 for design in DESIGNS if arrange(0, design)])
+    # regex_rune = regex()
+    # p1 = sum([1 for design in DESIGNS if re.search(regex_rune, design)])
     return (p1, -1)
 
 
-def part1(towels):
-    count = len(DESIGNS)
-    print(towels)
-    for towel in DESIGNS:
-        towel_copy = towel
-        for ttowel in towels:
-            towel_copy = towel_copy.replace(ttowel, "")
-        if towel_copy != towel and towel_copy != "":
-            print(towel, towel_copy)
-            count -= 1
-    return count
-
-
-def trim_towels():
-    mod_towels = []
+def arrange(i, design):
+    if i == len(design):
+        return True
     for towel in TOWELS:
-        if len(towel) == 1:
-            mod_towels.append(towel)
-            continue
-        towel_copy = towel
-        for ttowel in TOWELS:
-            towel_copy = towel_copy.replace(ttowel, "")
-        if towel_copy != towel and towel_copy != "":
-            mod_towels.append(towel)
-    return mod_towels
+        if (
+            i + len(towel) <= len(design)
+            and design[i : i + len(towel)] == towel
+            and arrange(i + len(towel), design)
+        ):
+            return True
+    return False
+
+
+def regex():
+    pattern = r"^(?:"
+    for towel in TOWELS:
+        pattern += "(" + towel + ")|"
+    pattern = pattern[:-1]
+    pattern += ")+$"
+    return pattern
 
 
 def get_data(test: bool):
