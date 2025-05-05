@@ -1,17 +1,28 @@
 def solve() -> tuple[int, int]:
     get_data(False)
 
-    p1 = find_sum()
+    values = list(find_all())
+    p1 = sum(list(map(lambda lis: lis[-1], values)))
+    print(list(find_change(values)))
     return (p1, -1)
 
 
-def find_sum():
-    sum = 0
+def find_change(values):
+    for lis in values:
+        pre_val = lis[0]
+        changes = []
+        for val in lis[1:]:
+            changes.append(val - pre_val)
+            pre_val = val
+        yield changes
+
+
+def find_all():
     for secret in DATA:
+        secrets = [secret]
         for _ in range(2000):
-            secret = next_secret(secret)
-        sum += secret
-    return sum
+            secrets.append(next_secret(secrets[-1]))
+        yield secrets
 
 
 def next_secret(secret: int) -> int:
