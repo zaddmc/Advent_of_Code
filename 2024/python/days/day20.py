@@ -1,15 +1,28 @@
-from heapq import heappop, heappush
+from collections import deque
 
 
 def solve() -> tuple[int, int]:
     get_data(False)
-    p1 = brute_force()
+    # p1 = brute_force()
+    p1 = skipping()
     return (p1, -1)
+
+
+def skipping():
+    start, end = find_endpoints()
+    base_time, visited = BFS(start, end, MAP)
+    options = 0
+
+    for (r, c), score in visited.items():
+        for nr, nc in [(r + 2, c), (r - 2, c), (r, c + 2), (r, c - 2)]:
+            if visited.get((nr, nc), 0) - score >= 102:
+                options += 1
+    return options
 
 
 def brute_force():
     start, end = find_endpoints()
-    base_time = BFS(start, end, MAP)
+    base_time, _ = BFS(start, end, MAP)
     options = 0
 
     for row, line in enumerate(MAP[1:-1]):
@@ -17,30 +30,26 @@ def brute_force():
             if char == "#":
                 map = MAP.copy()
                 map[row + 1] = MAP[row + 1][: col + 1] + "." + MAP[row + 1][col + 2 :]
-                new_time = BFS(start, end, map)
+                new_time, _ = BFS(start, end, map)
                 if base_time - new_time >= 100:
                     options += 1
     return options
 
 
 def BFS(start, end, map):
-    directions = [(-1, 0), (0, 1), (1, 0), (0, -1)]
 
-    pque = [(0, start)]
-    visited = set()
-    visited.add(start)
+    queue = deque([(0, start, dict())])
 
-    while pque:
-        score, (r, c) = heappop(pque)
+    while queue:
+        score, (r, c), visited = queue.popleft()
+        visited[(r, c)] = score
 
         if (r, c) == end:
-            return score
+            return score, visited
 
-        for dr, dc in directions:
-            nr, nc = r + dr, c + dc
+        for nr, nc in [(r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)]:
             if (nr, nc) not in visited and map[nr][nc] == ".":
-                heappush(pque, (score + 1, (nr, nc)))
-                visited.add((nr, nc))
+                queue.append((score + 1, (nr, nc), visited.copy()))
     return None
 
 
