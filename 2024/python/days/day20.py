@@ -4,20 +4,26 @@ from collections import deque
 def solve() -> tuple[int, int]:
     get_data(False)
     # p1 = brute_force()
-    p1 = skipping()
-    return (p1, -1)
+    p1 = skipping(2)
+    p2 = skipping(20)
+    return (p1, p2)
 
 
-def skipping():
+def skipping(max_dist: int):
     start, end = find_endpoints()
     base_time, visited = BFS(start, end, MAP)
-    options = 0
+    cheats = 0
+    threshold = 100
 
-    for (r, c), score in visited.items():
-        for nr, nc in [(r + 2, c), (r - 2, c), (r, c + 2), (r, c - 2)]:
-            if visited.get((nr, nc), 0) - score >= 102:
-                options += 1
-    return options
+    path = sorted(visited, key=visited.get)
+    for t2 in range(threshold, len(path)):
+        for t1 in range(t2 - threshold):
+            x1, y1 = path[t1]
+            x2, y2 = path[t2]
+            distance = abs(x1 - x2) + abs(y1 - y2)
+            if distance <= max_dist and t2 - t1 - distance >= threshold:
+                cheats += 1
+    return cheats
 
 
 def brute_force():
@@ -48,7 +54,7 @@ def BFS(start, end, map):
             return score, visited
 
         for nr, nc in [(r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)]:
-            if (nr, nc) not in visited and map[nr][nc] == ".":
+            if (nr, nc) not in visited and map[nr][nc] != "#":
                 queue.append((score + 1, (nr, nc), visited.copy()))
     return None
 
@@ -70,18 +76,15 @@ def get_data(test: bool):
 
 
 def find_endpoints():
-    global MAP
     start = end = None
     for idx, line in enumerate(MAP):
         for idy, char in enumerate(line):
             if char == "S":
                 start = (idx, idy)
-                MAP[idx] = MAP[idx].replace("S", ".")
                 if end:
                     return start, end
             if char == "E":
                 end = (idx, idy)
-                MAP[idx] = MAP[idx].replace("E", ".")
                 if start:
                     return start, end
 
