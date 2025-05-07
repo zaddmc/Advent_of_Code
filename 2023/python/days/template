@@ -1,0 +1,16 @@
+def solve() -> tuple[int, int]:
+    return (-1, -1)
+
+
+def get_data(test: bool):
+    global DATA
+    if test:
+        with open("../../input/dayXX.exp.txt", "r") as file:
+            DATA = file.read().splitlines()
+    else:
+        with open("../../input/dayXX.exp.txt", "r") as file:
+            DATA = file.read().splitlines()
+
+
+if __name__ == "__main__":
+    print(solve())
