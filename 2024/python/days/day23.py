@@ -4,13 +4,40 @@ from collections import defaultdict
 def solve() -> tuple[int, int]:
     get_data(False)
     p1 = len(find_groups())
-    p2 = find_largest()
+    # p2 = find_largest()
+    p2 = ",".join(
+        sorted(bron_kerbosch(set(), set(find_related()), set(), find_related()))
+    )
     return (p1, p2)
 
 
 def find_largest():
     related = find_related()
-    return -1
+
+    groups = set()
+    for mem1, set_mem in related.items():
+        for sub_mem in set_mem:
+            joined = ",".join(sorted([mem1, *list(set_mem & related[sub_mem])]))
+            groups.add(joined)
+    print(groups)
+
+
+def bron_kerbosch(result, source, exclude, related):
+    if not source and not exclude:
+        return result
+
+    max_clique = set()
+    for vertex in source.copy():
+        clique = bron_kerbosch(
+            result.union({vertex}),
+            source & related[vertex],
+            exclude & related[vertex],
+            related,
+        )
+        max_clique = max(max_clique, clique, key=len)
+        source.remove(vertex)
+        exclude.add(vertex)
+    return max_clique
 
 
 def find_groups():
