@@ -4,9 +4,8 @@ from functools import cache
 def solve() -> tuple[int, int]:
     get_data(False)
     p1 = sum([1 for design in DESIGNS if arrange(0, design)])
-    # regex_rune = regex()
-    # p1 = sum([1 for design in DESIGNS if re.search(regex_rune, design)])
-    return (p1, -1)
+    p2 = sum(map(count_unique, DESIGNS))
+    return (p1, p2)
 
 
 @cache
@@ -23,13 +22,16 @@ def arrange(i, design):
     return False
 
 
-def regex():
-    pattern = r"^(?:"
+@cache
+def count_unique(design: str):
+    if not design:
+        return 1
+
+    combinations = 0
     for towel in TOWELS:
-        pattern += "(" + towel + ")|"
-    pattern = pattern[:-1]
-    pattern += ")+$"
-    return pattern
+        if design.startswith(towel):
+            combinations += count_unique(design[len(towel) :])
+    return combinations
 
 
 def get_data(test: bool):
@@ -51,6 +53,7 @@ def get_data(test: bool):
             data = file.read().splitlines()
             TOWELS = data[0].split(", ")
             DESIGNS = data[2:]
+    TOWELS = set(TOWELS)
 
 
 if __name__ == "__main__":
