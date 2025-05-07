@@ -1,3 +1,6 @@
+from functools import cache
+
+
 def solve() -> tuple[int, int]:
     get_data(False)
     p1 = sum([1 for design in DESIGNS if arrange(0, design)])
@@ -6,6 +9,7 @@ def solve() -> tuple[int, int]:
     return (p1, -1)
 
 
+@cache
 def arrange(i, design):
     if i == len(design):
         return True
