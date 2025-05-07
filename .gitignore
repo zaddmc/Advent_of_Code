@@ -33,3 +33,4 @@ Cargo.lock
 # Cookie with session token
 .cookie
 
+__pycache__/
