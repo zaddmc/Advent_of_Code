@@ -1,36 +1,35 @@
-from itertools import combinations
+from collections import defaultdict
 
 
 def solve() -> tuple[int, int]:
-    get_data(True)
-    print(len(find_groups()), find_groups())
-    p1 = [group for group in find_groups() if "t" in group[::3]]
-    return (p1, -1)
+    get_data(False)
+    p1 = len(find_groups())
+    p2 = find_largest()
+    return (p1, p2)
+
+
+def find_largest():
+    related = find_related()
+    return -1
 
 
 def find_groups():
     related = find_related()
+    candidates = [c for c in related if c.startswith("t")]
     groups = set()
-    for mem1, set_mem in related.items():
-        for sub_mem in set_mem:
-            joined = ",".join(sorted([mem1, *list(set_mem & related[sub_mem])]))
-            if len(joined) > 8:
-                for new_group in combinations(joined.split(","), 3):
-                    groups.add(",".join(new_group))
-            if len(joined) == 8:
-                groups.add(joined)
+
+    for t in candidates:
+        for a in related[t]:
+            for b in related[a]:
+                if b in related[t]:
+                    groups.add(tuple(sorted([t, a, b])))
     return groups
 
 
 def find_related():
-    groups = {}
+    groups = defaultdict(set)
     for com1, com2 in DATA:
-        if com1 not in groups.keys():
-            groups[com1] = set()
         groups[com1].add(com2)
-
-        if com2 not in groups.keys():
-            groups[com2] = set()
         groups[com2].add(com1)
     return groups
 
