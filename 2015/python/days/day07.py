@@ -3,11 +3,12 @@ from collections import deque
 
 def solve() -> tuple[int, int]:
     get_data()
-    p1 = emulate()
-    return (p1, -1)
+    p1 = emulate(None)
+    p2 = emulate(p1)
+    return (p1, p2)
 
 
-def emulate():
+def emulate(override):
     insts = deque(INSTRUCTIONS)
     memory = {}
     while insts:
@@ -17,6 +18,8 @@ def emulate():
         if "AND" in parts:
             if parts[0] in memory.keys() and parts[2] in memory.keys():
                 memory[parts[-1]] = memory[parts[0]] & memory[parts[2]]
+            elif parts[0].isdigit() and parts[2] in memory.keys():
+                memory[parts[-1]] = int(parts[0]) & memory[parts[2]]
             else:
                 insts.append(instruction)
             continue
@@ -50,7 +53,10 @@ def emulate():
             continue
 
         if parts[0].isdigit():
-            memory[parts[-1]] = int(parts[0])
+            if override and parts[-1] == "b":
+                memory[parts[-1]] = override
+            else:
+                memory[parts[-1]] = int(parts[0])
             continue
 
         if parts[0] in memory.keys():
