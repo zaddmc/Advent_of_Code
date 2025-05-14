@@ -3,14 +3,10 @@ def solve() -> tuple[int, int]:
     return (-1, -1)
 
 
-def get_data(test: bool):
+def get_data():
     global DATA
-    if test:
-        with open("../../input/dayXX.exp.txt", "r") as file:
-            DATA = file.read().splitlines()
-    else:
-        with open("../../input/dayXX.txt", "r") as file:
-            DATA = file.read().splitlines()
+    with open("../../input/dayXX.txt", "r") as file:
+        DATA = file.read().splitlines()
 
 
 if __name__ == "__main__":
