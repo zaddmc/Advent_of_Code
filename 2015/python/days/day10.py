@@ -1,36 +1,22 @@
 def solve() -> tuple[int, int]:
     get_data()
-    string = DATA
-    for _ in range(40):
-        string = expand(string)
-    p1 = len(string)
-    for _ in range(10):
-        string = expand(string)
-    p2 = len(string)
-    return (p1, p2)
+    print(validate("ghijklmn"))
+    print(validate("g"))
+    return (-1, -1)
 
 
-def expand(string):
-    previous_char = string[0]
-    count = 1
-    new_string = ""
-    for new_char in string[1:]:
-        if new_char == previous_char:
-            count += 1
-        else:
-            new_string += str(count) + previous_char
-            previous_char = new_char
-            count = 1
-    else:
-        new_string += str(count) + previous_char
+def validate(string):
+    for char in string:
+        if char in "iol":
+            return False
 
-    return new_string
+    return True
 
 
 def get_data():
     global DATA
     with open("../../input/day10.txt", "r") as file:
-        DATA = file.read().strip()
+        DATA = file.read().splitlines()
 
 
 if __name__ == "__main__":
