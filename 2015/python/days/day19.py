@@ -1,24 +1,23 @@
 def solve() -> tuple[int, int]:
     get_data(False)
     p1 = len(find_uniques(MOLECULE))
-    p2 = make_molecule("e") - 1
-    p2 = deconstruct()
+    visited = set()
+    visited.add(MOLECULE)
+    p2 = deconstruct(0, visited, [MOLECULE], MOLECULE)
     return (p1, p2)
 
 
-def deconstruct(visited: set, last):
-    pass
-
-
-def make_molecule(curr: str):
-    if curr == MOLECULE:
-        return 1
-    if len(curr) > len(MOLECULE):
-        return 0
-    for nm in find_uniques(curr):
-        res = make_molecule(nm)
-        if res:
-            return res + 1
+def deconstruct(depth: int, visited: set, last: list, curr: str):
+    if curr == "e":
+        return depth
+    for new in find_uniques(curr):
+        if new in visited:
+            continue
+        visited.add(new)
+        last.append(new)
+        return deconstruct(depth + 1, visited, last, new)
+    last.pop()
+    return deconstruct(depth - 1, visited, last, last[-1])
 
 
 def find_uniques(curr):
