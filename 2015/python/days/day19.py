@@ -1,29 +1,40 @@
+import re
+import sys
+from random import shuffle
+
+sys.setrecursionlimit(100000000)
+
+
 def solve() -> tuple[int, int]:
-    get_data(False)
+    get_data(True)
     p1 = len(find_uniques(MOLECULE))
-    visited = set()
-    visited.add(MOLECULE)
-    p2 = deconstruct(0, visited, [MOLECULE], MOLECULE)
+    p2 = random_shit()
     return (p1, p2)
 
 
-def deconstruct(depth: int, visited: set, last: list, curr: str):
-    if curr == "e":
-        return depth
-    for new in find_uniques(curr):
-        if new in visited:
-            continue
-        visited.add(new)
-        last.append(new)
-        return deconstruct(depth + 1, visited, last, new)
-    last.pop()
-    return deconstruct(depth - 1, visited, last, last[-1])
+def random_shit():
+    global REPLACEMENTS
+    target = MOLECULE
+    depth = 0
+
+    while target != "e":
+        tmp = target
+        for a, b in REPLACEMENTS:
+            if b not in target:
+                continue
+            target.replace(b, a, 1)
+            depth += 1
+
+        if tmp == target:
+            target = MOLECULE
+            depth = 0
+            shuffle(REPLACEMENTS)
+    return depth
 
 
 def find_uniques(curr):
     uniques = set()
-    for re in REPLACEMENTS:
-        re_key, re_val = re.split(" ")
+    for re_key, re_val in REPLACEMENTS:
 
         prev_index = 0
         for _ in range(curr.count(re_key)):
@@ -39,14 +50,14 @@ def get_data(test: bool):
     if test:
         with open("../../input/day19.exp.txt", "r") as file:
             data = file.read().splitlines()
-            REPLACEMENTS = list(map(lambda s: s.replace("=> ", ""), data[:-2]))
-            MOLECULE = data[-1]
-
     else:
         with open("../../input/day19.txt", "r") as file:
             data = file.read().splitlines()
-            REPLACEMENTS = list(map(lambda s: s.replace("=> ", ""), data[:-2]))
-            MOLECULE = data[-1]
+
+    REPLACEMENTS = list(
+        map(lambda s: s.split(), map(lambda s: s.replace("=> ", ""), data[:-2]))
+    )
+    MOLECULE = data[-1]
 
 
 if __name__ == "__main__":
