@@ -19,7 +19,10 @@ def solve() -> tuple[int, int]:
         "Magic Missile",
     ]
     for action in permutations(actions):
-        print(simulate(action))
+        result = simulate(action)
+        if result and result < BEST:
+            BEST = result
+            print(result, action)
     exit()
     p1 = adventure()
     return (p1, -1)
@@ -45,12 +48,14 @@ def simulate(actions):
     mana_spent = 0
     actions = cycle(actions)
 
-    for turn in cycle(("player", "boss")):
+    for i, turn in enumerate(cycle(("player", "boss"))):
         for name, turns in effects.items():
             match name:
                 case "Poison":
                     if turns:
                         boss["Hit Points"] -= 3
+                        if boss["Hit Points"] <= 0:
+                            return mana_spent
                 case "Recharge":
                     if turns:
                         player["Mana"] += 101
