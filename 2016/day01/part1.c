@@ -39,9 +39,9 @@ int main(int argc, char *argv[]) {
     char number[10] = "        ";
     int numberPtr = 0;
 
-    FILE *ftpr;
-    ftpr = fopen("input.txt", "r");
-    while ((ch = fgetc(ftpr)) != EOF) {
+    FILE *fptr;
+    fptr = fopen("input.txt", "r");
+    while ((ch = fgetc(fptr)) != EOF) {
         if (ch == 'R' | ch == 'L') {
             dir = ch;
             continue;
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
         }
         numberPtr = 0;
     }
-    fclose(ftpr);
+    fclose(fptr);
 
     int result = abs(northsouth) + abs(eastwest);
     printf("%i\n", result);

@@ -34,3 +34,8 @@ Cargo.lock
 .cookie
 
 __pycache__/
+
+*
+!*.*
+!*/
+
