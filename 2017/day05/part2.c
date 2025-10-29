@@ -26,7 +26,6 @@ int main(void) {
         if (val >= 3) {
             memory[ip]--;
         } else {
-
             memory[ip]++;
         }
         ip += val;
