@@ -4,13 +4,21 @@ def solve(moves):
     cancel_opposite(moves)
     reduce_between(moves)
 
-    print(moves)
     return len(moves)
 
 
 def reduce_between(moves):
-    for l, c, r in [("n", "ne", "se")]:
-        pass
+    items = ["n", "ne", "se", "s", "sw", "nw"]
+    for offset in range(6):
+        left = items[offset]
+        center = items[(offset + 1) % 6]
+        right = items[(offset + 2) % 6]
+
+        common_count = min(moves.count(left), moves.count(right))
+        for _ in range(common_count):
+            moves.remove(left)
+            moves.remove(right)
+            moves.append(center)
 
 
 def cancel_opposite(moves):
