@@ -6,7 +6,17 @@ def solve(data):
     for _ in range(1000):
         for particle in particles:
             particle.move()
-    return min(map(lambda p: p.get_manhatten_dist(), particles))[1]
+
+        remoethis = []
+        for particle in particles:
+            if particle.posistion in [
+                p.posistion for p in particles if particle.id != p.id
+            ]:
+                remoethis.append(particle)
+        for thi in remoethis:
+            particles.remove(thi)
+
+    return len(particles)
 
 
 class Particle:
