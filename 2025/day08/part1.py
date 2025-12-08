@@ -4,12 +4,6 @@ from functools import cache
 def solve(data, n: int):
     data = tuple(tuple(map(int, v.split(","))) for v in data)
 
-    connections = set()
-
-    for _ in range(n):
-        pair = find_the_closest(data, connections)
-        connections.add(pair)
-
     def init_set(t) -> set:
         s = set()
         s.add(t)
@@ -23,38 +17,26 @@ def solve(data, n: int):
                 graph.remove(se)
                 return se
 
-    for t1, t2 in connections:
+    for _, t1, t2 in get_closest(data, n):
         set1 = find_set(t1)
         if t2 in set1:
             graph.append(set1)
             continue
 
         set2 = find_set(t2)
-
         graph.append(set1.union(set2))
 
-    print("Finished")
     return eval("*".join(map(str, sorted(len(n) for n in graph)[-3:])))
 
 
-def find_the_closest(data: tuple[tuple[int]], connections: set):
-    def find_closest(orig: tuple[int], begin: int):
-        clostset_junc = None
-        clostset_dist = 999999999
-
-        for target in data[begin:]:
-            if target == orig:
+def get_closest(data, n: int):
+    vals = []
+    for idx, o in enumerate(data):
+        for t in data[idx:]:
+            if t == o:
                 continue
-            if (target, orig) in connections:
-                continue
-
-            dist = get_dist(orig, target)
-            if dist < clostset_dist:
-                clostset_dist = dist
-                clostset_junc = target
-        return clostset_dist, clostset_junc
-
-    return min((*find_closest(t, idx), t) for idx, t in enumerate(data))[1:]
+            vals.append((get_dist(o, t), o, t))
+    return sorted(vals)[:n]
 
 
 @cache
