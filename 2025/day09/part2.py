@@ -9,13 +9,39 @@ def solve(points: list[str]):
     for p1, p2 in combinations(points, 2):
         p3, p4 = other_points(p1, p2)
         if all(point_in_orthogonal_polygon(points, p) for p in [p3, p4]):
+            if square_inside_polygon(points, (p1, p2, p3, p4)):
+                print("Yes")
             squares.append((calc_area(p1, p2), (p1, p2, p3, p4)))
-    for _, polygon in squares:
-        if any(point_in_orthogonal_polygon(polygon, p) for p in points):
-            print(len(squares))
-            squares.remove((_, polygon))
     print(sorted(squares))
     return max(squares)[0]
+
+
+def segments_intersect(a, b, c, d):
+    # (a,b) is segment 1, (c,d) is segment 2
+    def ccw(p1, p2, p3):
+        return (p3[1] - p1[1]) * (p2[0] - p1[0]) > (p2[1] - p1[1]) * (p3[0] - p1[0])
+
+    return (ccw(a, c, d) != ccw(b, c, d)) and (ccw(a, b, c) != ccw(a, b, d))
+
+
+def square_inside_polygon(polygon, square_corners):
+    # 1. corner test
+    for c in square_corners:
+        if not point_in_orthogonal_polygon(polygon, c):
+            return False
+
+    # 2. edge intersection test
+    square_edges = [(square_corners[i], square_corners[(i + 1) % 4]) for i in range(4)]
+    polygon_edges = [
+        (polygon[i], polygon[(i + 1) % len(polygon)]) for i in range(len(polygon))
+    ]
+
+    for e1 in square_edges:
+        for e2 in polygon_edges:
+            if segments_intersect(e1[0], e1[1], e2[0], e2[1]):
+                return False
+
+    return True
 
 
 @cache
