@@ -9,13 +9,13 @@ def solve(points: list[str]):
     for p1, p2 in combinations(points, 2):
         p3, p4 = other_points(p1, p2)
         if all(point_in_orthogonal_polygon(points, p) for p in [p3, p4]):
-            squares.append((calc_area(p1, p2), p1, p2, p3, p4))
+            squares.append((calc_area(p1, p2), (p1, p2, p3, p4)))
+    for _, polygon in squares:
+        if any(point_in_orthogonal_polygon(polygon, p) for p in points):
+            print(len(squares))
+            squares.remove((_, polygon))
     print(sorted(squares))
     return max(squares)[0]
-
-
-def AABB_collsion(polygon, point):
-    return 1
 
 
 @cache
