@@ -1,17 +1,12 @@
-import re
-from heapq import heappop, heappush
-
 import numpy as np
 from scipy.optimize import Bounds, LinearConstraint, milp
 
 
 def solve(data):
-    rune = r"^\[(.*?)\]\s*((?:\([^)]*\)\s*)+) \{([^}]*)\}$"
     total = 0
     for d in data:
-        buttons, joltage = re.findall(rune, d)[0][1:]
-        joltage = tuple(map(int, joltage.split(",")))
-
+        buttons, joltage = d.split("] (")[1].split(") {")
+        joltage = np.array(tuple(map(int, joltage[:-1].split(","))))
         buttons = tuple(
             tuple(map(int, b.split(",")))
             for b in buttons.replace("(", "").replace(")", "").split()
@@ -21,16 +16,14 @@ def solve(data):
         for idx, but in enumerate(buttons):
             for b in but:
                 A_eq[b][idx] = 1
-        b_eq = np.array(joltage)
-        c = np.array([1 for _ in A_eq[0]])
 
-        bounds = Bounds(lb=np.zeros(4), ub=np.full(4, np.inf))
+        c = np.full(n, 1)
+        bounds = Bounds(lb=np.zeros(n), ub=np.full(n, np.inf))
+        eq_constraint = LinearConstraint(A_eq, lb=joltage, ub=joltage)
 
-        eq_constraint = LinearConstraint(A_eq, lb=b_eq, ub=b_eq)
         res = milp(c, integrality=c, constraints=[eq_constraint], bounds=bounds)
-
-        total += pulp.value(prob.objective)
-    return total
+        total += res.fun
+    return int(total)
 
 
 if __name__ == "__main__":
