@@ -1,7 +1,8 @@
 import re
 from heapq import heappop, heappush
 
-from scipy.optimize import linprog
+import numpy as np
+from scipy.optimize import Bounds, LinearConstraint, milp
 
 
 def solve(data):
@@ -15,46 +16,21 @@ def solve(data):
             tuple(map(int, b.split(",")))
             for b in buttons.replace("(", "").replace(")", "").split()
         )
-        new_buttons = [[0 for _ in buttons] for _ in joltage]
-        for i in range(6):
-            for j in range(4):
-                new_buttons[j][i] = 1 if j in buttons[i] else 0
+        m, n = len(joltage), len(buttons)
+        A_eq = np.zeros((m, n), dtype=int)
+        for idx, but in enumerate(buttons):
+            for b in but:
+                A_eq[b][idx] = 1
+        b_eq = np.array(joltage)
+        c = np.array([1 for _ in A_eq[0]])
 
-        c = [1 for _ in buttons]
-        A_eq = new_buttons
-        b_eq = joltage
-        print(c, A_eq, b_eq, sep="\n")
-        print(linprog(c, A_ub=A_eq, b_ub=b_eq))
-    print(total)
+        bounds = Bounds(lb=np.zeros(4), ub=np.full(4, np.inf))
+
+        eq_constraint = LinearConstraint(A_eq, lb=b_eq, ub=b_eq)
+        res = milp(c, integrality=c, constraints=[eq_constraint], bounds=bounds)
+
+        total += pulp.value(prob.objective)
     return total
-
-
-def calc_actions(joltage: tuple[int], buttons: tuple[int]):
-    not_visited = [(0, joltage)]
-
-    while not_visited:
-        actions, c_joltage = heappop(not_visited)
-
-        for but in buttons:
-            r_joltage = apply_button(c_joltage, but)
-            if sum(joltage) == 0:
-                return actions + 1
-            if is_valid(r_joltage):
-                heappush(not_visited, (actions + 1, r_joltage))
-
-
-def is_valid(joltage: tuple[int]):
-    for j in joltage:
-        if j < 0:
-            return
-    return True
-
-
-def apply_button(joltage: tuple[int], button: tuple[int]):
-    joltage = list(joltage)
-    for idx in button:
-        joltage[idx] -= 1
-    return tuple(joltage)
 
 
 if __name__ == "__main__":
