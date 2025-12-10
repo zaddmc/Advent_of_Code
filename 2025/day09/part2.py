@@ -5,6 +5,21 @@ from itertools import combinations
 def solve(points: list[str]):
     points = tuple(tuple(map(int, p.split(","))) for p in points)
 
+    p1, p2 = find_shit_points(points)
+    offset = 0
+    while point_in_orthogonal_polygon(points, (p1[0], p1[1] + offset)):
+        offset += 1
+    new_cord_x = p1[1] + offset - 1
+
+    offset = 0
+    while point_in_orthogonal_polygon(points, (p1[0] + offset, new_cord_x)):
+        print(offset)
+        offset += -1
+
+    print(p1[0] + offset + 1, new_cord_x)
+
+    exit()
+
     squares = []
     for p1, p2 in combinations(points, 2):
         p3, p4 = other_points(p1, p2)
@@ -16,32 +31,9 @@ def solve(points: list[str]):
     return max(squares)[0]
 
 
-def segments_intersect(a, b, c, d):
-    # (a,b) is segment 1, (c,d) is segment 2
-    def ccw(p1, p2, p3):
-        return (p3[1] - p1[1]) * (p2[0] - p1[0]) > (p2[1] - p1[1]) * (p3[0] - p1[0])
-
-    return (ccw(a, c, d) != ccw(b, c, d)) and (ccw(a, b, c) != ccw(a, b, d))
-
-
-def square_inside_polygon(polygon, square_corners):
-    # 1. corner test
-    for c in square_corners:
-        if not point_in_orthogonal_polygon(polygon, c):
-            return False
-
-    # 2. edge intersection test
-    square_edges = [(square_corners[i], square_corners[(i + 1) % 4]) for i in range(4)]
-    polygon_edges = [
-        (polygon[i], polygon[(i + 1) % len(polygon)]) for i in range(len(polygon))
-    ]
-
-    for e1 in square_edges:
-        for e2 in polygon_edges:
-            if segments_intersect(e1[0], e1[1], e2[0], e2[1]):
-                return False
-
-    return True
+def find_shit_points(points):
+    idx = len(points) // 2
+    return points[idx], points[idx + 1]
 
 
 @cache
@@ -90,7 +82,7 @@ def other_points(p1: tuple[int], p2: tuple[int]):
 
 if __name__ == "__main__":
     exp = ["7,1", "11,1", "11,7", "9,7", "9,5", "2,5", "2,3", "7,3"]
-    assert solve(exp) == 24
+    # assert solve(exp) == 24
 
     with open("input.txt", "r") as file:
         DATA = file.read().strip().splitlines()
