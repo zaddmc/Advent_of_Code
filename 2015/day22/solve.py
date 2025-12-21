@@ -1,54 +1,28 @@
 import random
-from itertools import cycle, permutations
+from itertools import cycle
 
 
-def solve() -> tuple[int, int]:
-    get_data()
-    global BEST
-    BEST = 1203123123123123123123123123
-    actions = [
-        "Recharge",
-        "Shield",
-        "Recharge",
-        "Shield",
-        "Drain",
-        "Poison",
-        "Poison",
-        "Poison",
-        "Magic Missile",
-        "Magic Missile",
-    ]
-    for action in permutations(actions):
-        result = simulate(action)
-        if result and result < BEST:
-            BEST = result
-            print(result, action)
-    exit()
-    p1 = adventure()
-    return (p1, -1)
-
-
-def adventure():
-    global BEST
-    BEST = 100000000000
+def solve(player_stats, boss_stats, hard_mode):
+    best = 10000000000
     for _ in range(500_000):
-        result = simulate()
-        if result and result < BEST:
-            print("new best", result)
-            BEST = result
-
-    return BEST
+        res = simulate(player_stats, boss_stats, best, hard_mode)
+        if res and res < best:
+            best = res
+    return best
 
 
-def simulate(actions):
-    boss = BOSS.copy()
-    # boss = {"Hit Points": 14, "Damage": 8}
-    player = {"Hit Points": 50, "Mana": 500}
-    effects = {n: 0 for n in ["Shield", "Poison", "Recharge"]}
+def simulate(player_stats, boss_stats, best_score, hard_mode):
+    boss = {"Hit Points": boss_stats[0], "Damage": boss_stats[1]}
+    player = {"Hit Points": player_stats[0], "Mana": player_stats[1]}
+    effects = {"Shield": 0, "Poison": 0, "Recharge": 0}
     mana_spent = 0
-    actions = cycle(actions)
 
     for i, turn in enumerate(cycle(("player", "boss"))):
+        if hard_mode:
+            player["Hit Points"] -= 1
+            if player["Hit Points"] <= 0:
+                return None
+
         for name, turns in effects.items():
             match name:
                 case "Poison":
@@ -60,14 +34,16 @@ def simulate(actions):
                     if turns:
                         player["Mana"] += 101
             if turns:
-                effects[name] -= 1 if turns > 0 else 0
+                effects[name] -= 1 if turns else 0
+
+        if boss["Hit Points"] <= 0:
+            return mana_spent
 
         if turn == "player":
             while True:
-                match actions.__next__():
-                    # match random.choice(
-                    #    ["Magic Missile", "Drain", "Shield", "Poison", "Recharge"]
-                    # ):
+                match random.choice(
+                    ["Magic Missile", "Drain", "Shield", "Poison", "Recharge"]
+                ):
                     case "Magic Missile":
                         if player["Mana"] >= 53:
                             player["Mana"] -= 53
@@ -100,26 +76,30 @@ def simulate(actions):
                             mana_spent += 229
                             effects["Recharge"] = 5
                             break
+                    case x:
+                        print("failed", x)
+
+        if best_score < mana_spent:
+            return None
 
         if boss["Hit Points"] <= 0:
             return mana_spent
 
-        if mana_spent > BEST:
-            return None
-
         if turn == "boss":
-            player["Hit Points"] -= boss["Damage"] - 7 if effects["Shield"] else 0
+            dam = boss["Damage"] if not effects["Shield"] else boss["Damage"] - 7
+            player["Hit Points"] -= dam if dam > 1 else 1
 
             if player["Hit Points"] <= 0:
                 return None
 
 
-def get_data():
-    global BOSS
-    with open("../../input/day22.txt", "r") as file:
-        data = file.read().splitlines()
-    BOSS = {s.split(": ")[0]: int(s.split(": ")[1]) for s in data}
-
-
 if __name__ == "__main__":
-    print(solve())
+    with open("input.txt", "r") as file:
+        boss_stats = tuple(
+            map(lambda s: int(s.split(": ")[1]), file.read().splitlines())
+        )
+    player_stats = (50, 500)
+    p1 = solve(player_stats, boss_stats, False)
+    p2 = solve(player_stats, boss_stats, True)
+
+    print(p1, p2)
